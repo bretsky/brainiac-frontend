@@ -3,6 +3,7 @@
 	import { onDestroy } from 'svelte';
 	import {userid, token} from '../stores.ts';
 	import { goto } from '$app/navigation';
+	import { API_BASE_URL } from '$lib/constants/env';
 
 	const isBrowser = typeof window !== 'undefined';
 	if (isBrowser && (!$userid || !$token)) goto('/login');
@@ -20,7 +21,7 @@
 	const connect = () => {
 		connectAttempted = true;
 		connecting = true;
-		socket = io("http://localhost:1999");
+		socket = io(API_BASE_URL);
 
 		socket.on('connect', () => {
 			connecting = false;
