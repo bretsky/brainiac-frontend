@@ -9,4 +9,4 @@ RUN npm run build
 # server environment
 FROM nginx:alpine
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --from=build /app/public /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
