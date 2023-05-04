@@ -3,6 +3,8 @@
 	import {userid, token} from '../../stores.ts';
 	import { goto } from '$app/navigation';
 
+	console.log("test login");
+
 	const isBrowser = typeof window !== 'undefined';
 	if (isBrowser && $userid && $token) goto('/');
 
