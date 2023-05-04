@@ -3,6 +3,8 @@
 	import {userid, token} from '../stores.ts';
 	import { goto } from '$app/navigation';
 
+	console.log("testLayout");
+
 	const logout = () => {
 		$userid = null;
 		localStorage.removeItem('userid');
