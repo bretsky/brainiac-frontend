@@ -147,7 +147,7 @@
 		flex-direction: row;
 		align-items: baseline;
 		justify-content: center;
-		width: 75vw;
+		width: 100vw;
 	}
 
 	.number-input {
