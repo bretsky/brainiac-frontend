@@ -32,7 +32,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@vercel/analytics": "^1.0.1",
 		"socket.io-client": "^4.6.1"
 	}
 }
