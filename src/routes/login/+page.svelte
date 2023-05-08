@@ -2,8 +2,9 @@
 	import { API_BASE_URL } from '$lib/constants/env';
 	import {userid, token} from '../../stores.ts';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
-	console.log("test login");
+	if (browser && $userid && $token) goto('/');
 
 	const isBrowser = typeof window !== 'undefined';
 	if (isBrowser && $userid && $token) goto('/');
