@@ -103,6 +103,20 @@
 		'*': "Multiplication",
 		'/': "Division",
 	}
+
+	const explanation = (opConfig, op) => {
+		const {negative, max} = opConfig;
+		switch (op) {
+			case '+':
+				return `x + y = z, ${negative ? -max : 0} ≤ x, y ≤ ${max}`;
+			case '-':
+				return `x − y = z, ${negative ? -max : 0} ≤ x, y ≤ ${max}`;
+			case '*':
+				return `x × y = z, ${negative ? -max : 0} ≤ x, y ≤ ${max}`;
+			case '/':
+				return `z ÷ x = y, ${negative ? -max : 0} ≤ x, y ≤ ${max}`;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -157,7 +171,7 @@
 		<button on:click={resetConfig} class="reset-config">Reset</button>
 		{#each Object.entries($config) as [op, opConfig]}
 			<div class="row">
-				{operationNames[op]}: 
+				{operationNames[op]}: <span class="explanation">{explanation(opConfig, op)}</span>
 			</div>
 			<div class="row settings-row">
 				{#each Object.entries(opConfig) as [name, value]}
@@ -273,5 +287,10 @@
 
 	.incorrect:focus[type=number] {
 		outline: 2px solid #EF476F;
+	}
+
+	.explanation {
+		color: rgba(0, 0, 0, 0.35);
+		margin-left: 6px;
 	}
 </style>
