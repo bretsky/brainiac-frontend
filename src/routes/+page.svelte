@@ -252,7 +252,9 @@
 		flex-direction: column;
 		width: 50vw;
 		left: 25vw;
-		margin-bottom: 6px;
+		padding-top: 12px;
+		padding-bottom: 12px;
+    	box-sizing: border-box;
 	}
 
 	.small-input {
