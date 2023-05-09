@@ -48,9 +48,10 @@
 
 		socket.on('question', (data) => {
 			console.log(`question: ${data.question}`);
+			socket.emit('ping', {userid: $userid});
 			question = data.question;
 			answer = '';
-			socket.emit('ping', {userid: $userid});
+			incorrectAnswer = false;
 		})
 
 		socket.on('incorrectAnswer', (data) => {
