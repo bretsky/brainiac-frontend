@@ -1,9 +1,11 @@
 <script>
 	import { io } from 'socket.io-client';
 	import { onDestroy } from 'svelte';
-	import {userid, token} from '../stores.ts';
+	import {userid, token, config, defaultConfig} from '../stores.ts';
 	import { goto } from '$app/navigation';
 	import { API_BASE_URL } from '$lib/constants/env';
+
+	console.log($config);
 
 	const isBrowser = typeof window !== 'undefined';
 	if (isBrowser && (!$userid || !$token)) goto('/login');
@@ -14,6 +16,8 @@
 	let connected = false;
 	let errorMessage = null;
 	let socket = null;
+	let showSettings = false;
+	let incorrectAnswer = false;
 
 	let answer;
 	let question;
@@ -48,6 +52,13 @@
 			answer = '';
 			socket.emit('ping', {userid: $userid});
 		})
+
+		socket.on('incorrectAnswer', (data) => {
+			incorrectAnswer = data.response;
+			console.log(incorrectAnswer);
+			console.log(answer);
+			console.log(answer === incorrectAnswer);
+		})
 		
 	};
 
@@ -58,7 +69,7 @@
 
 	const start = () => {
 		started = true;
-		socket.emit("start", {userid: $userid});
+		socket.emit("start", {userid: $userid, config: $config});
 	}
 
 	const pause = () => {
@@ -67,13 +78,31 @@
 	}
 
 	const attemptAnswer = () => {
-		if (!question || !answer) return;
+		if (!question || answer === null || answer === "") return;
 		console.log(`answer is ${answer}`)
 		socket.emit("answer", {answer, userid: $userid});
 	}
 
+	const toggleSettings = () => {
+		showSettings = !showSettings;
+	}
 
+	const saveConfig = () => {
+		console.log($config);
+		localStorage.setItem('config', JSON.stringify($config));
+	}
+
+	const resetConfig = () => {
+		$config = JSON.parse(JSON.stringify($defaultConfig));
+		saveConfig();
+	}
 	
+	const operationNames = {
+		'+': "Addition",
+		'-': "Subtraction",
+		'*': "Multiplication",
+		'/': "Division",
+	}
 </script>
 
 <svelte:head>
@@ -95,8 +124,9 @@
 					<div class="question">{question}</div>
 					<div class="number-container">
 						<input
+							class:incorrect={incorrectAnswer === answer}
 							class="number-input"
-							bind:value="{answer}"
+							bind:value={answer}
 							type="number"
 							placeholder="?"
 						/>
@@ -104,9 +134,15 @@
 				</div>
 			</form>
 			
-			<button on:click={pause}>Pause</button>
+			<div class="row">
+				<button on:click={pause}>Pause</button>
+				<div class="settings-toggle" on:click={toggleSettings}>⚙️</div>
+			</div>
 		{:else}
-			<button on:click={start}>Start</button>
+			<div class="row">
+				<button on:click={start}>Start</button>
+				<div class="settings-toggle" on:click={toggleSettings}>⚙️</div>
+			</div>
 		{/if}
 	{:else if connectAttempted && !connected}
 		<div class="error-message">Error: disconnected</div>
@@ -114,7 +150,31 @@
 	{:else}
 		<button on:click={connect}>Connect</button>
 	{/if}
+	
 </section>
+{#if showSettings}
+	<div class="settings">
+		<button on:click={resetConfig} class="reset-config">Reset</button>
+		{#each Object.entries($config) as [op, opConfig]}
+			<div class="row">
+				{operationNames[op]}: 
+			</div>
+			<div class="row settings-row">
+				{#each Object.entries(opConfig) as [name, value]}
+					<div class="row settings-row">
+						{name}:
+						{#if typeof value === "number"}
+							<input bind:value={$config[op][name]} on:change={saveConfig} class="small-input" type="number"/>
+						{:else if typeof value === "boolean"}
+							<input bind:checked={$config[op][name]} on:change={saveConfig} class="small-input" type="checkbox"/>
+						{/if}
+					</div>
+				{/each}
+			</div>
+			
+		{/each}
+	</div>
+{/if}
 
 <style>
 	section {
@@ -165,5 +225,51 @@
 		box-sizing: border-box;
 		font-size: 36px;
 		margin-left: 6px;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
+	}
+
+	.settings-row {
+		justify-content: space-evenly;
+		align-items: center;
+	}
+
+	.settings-toggle {
+		cursor: pointer;
+		width: 0;
+    	margin-left: 6px;
+    	margin-right: -6px;
+	}
+
+	.settings {
+		position: absolute;
+		bottom: 0px;
+		display: flex;
+		flex-direction: column;
+		width: 50vw;
+		left: 25vw;
+		margin-bottom: 6px;
+	}
+
+	.small-input {
+		margin: 0.25em;
+	}
+
+	.small-input[type="number"] {
+		width: 5em;
+	}
+
+	.reset-config {
+		position: absolute;
+		top: 0px;
+		right: 0px;
+	}
+
+	.incorrect:focus[type=number] {
+		outline: 2px solid #EF476F;
 	}
 </style>

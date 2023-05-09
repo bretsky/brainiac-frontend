@@ -1,6 +1,7 @@
-import { writable } from "svelte/store"
+import { writable } from "svelte/store";
+import { browser } from '$app/environment';
 
-const isBrowser = typeof window !== 'undefined';
-
-export const userid = writable(isBrowser ? localStorage.getItem("userid") : null);
-export const token = writable(isBrowser ? localStorage.getItem("token") : null)
+export const userid = writable(browser ? localStorage.getItem("userid") : null);
+export const token = writable(browser ? localStorage.getItem("token") : null);
+export const config = writable(browser ? JSON.parse(localStorage.getItem("config")) : {});
+export const defaultConfig = writable(browser ? JSON.parse(localStorage.getItem("defaultConfig")) : {});

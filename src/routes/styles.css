@@ -131,7 +131,7 @@ input[type=number] {
 	-moz-appearance: textfield;
 }
 
-input:focus {
+input:focus[type=number] {
 	outline: 2px solid #90D4E0;
 	outline-offset: -1px;
 }

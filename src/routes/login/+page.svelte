@@ -1,13 +1,10 @@
 <script>
 	import { API_BASE_URL } from '$lib/constants/env';
-	import {userid, token} from '../../stores.ts';
+	import {userid, token, config, defaultConfig} from '../../stores.ts';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 
 	if (browser && $userid && $token) goto('/');
-
-	const isBrowser = typeof window !== 'undefined';
-	if (isBrowser && $userid && $token) goto('/');
 
 	let inputUserid; let inputPassword;
 
@@ -38,6 +35,11 @@
 			$token = resJson.token;
 			localStorage.setItem('userid', resJson.userid);
 			$userid = resJson.userid;
+			let newConfig = {...resJson.config, ...$config};
+			localStorage.setItem('config', JSON.stringify(newConfig));
+			$config = newConfig;
+			localStorage.setItem('defaultConfig', JSON.stringify(resJson.config));
+			$defaultConfig = resJson.config;
 			goto('/');
 		}
 	}
