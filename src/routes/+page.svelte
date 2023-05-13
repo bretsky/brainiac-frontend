@@ -18,6 +18,8 @@
 	let socket = null;
 	let showSettings = false;
 	let incorrectAnswer = false;
+	let answered = 0;
+	let attempts = 0;
 
 	let answer;
 	let question;
@@ -52,14 +54,20 @@
 			question = data.question;
 			answer = '';
 			incorrectAnswer = false;
-		})
+		});
 
 		socket.on('incorrectAnswer', (data) => {
 			incorrectAnswer = data.response;
+			attempts += 1;
 			console.log(incorrectAnswer);
 			console.log(answer);
 			console.log(answer === incorrectAnswer);
-		})
+		});
+
+		socket.on('correctAnswer', (data) => {
+			answered += 1;
+			attempts += 1;
+		});
 		
 	};
 
@@ -133,7 +141,6 @@
 			<div class="error-message">Error: {errorMessage}</div>
 		{/if}
 		{#if started}
-			
 			<form on:submit|preventDefault="{attemptAnswer}">
 				<div class="game-area">
 					<div class="question">{question}</div>
@@ -148,6 +155,7 @@
 					</div>
 				</div>
 			</form>
+			<div class="answer-count">Answered: {answered} / {attempts}</div>
 			
 			<div class="row">
 				<button on:click={pause}>Pause</button>
@@ -229,6 +237,7 @@
 		box-sizing: border-box;
 		font-size: 36px;
 		width: 6em;
+		margin-bottom: 0px;
 	}
 
 	.number-container {
@@ -293,5 +302,9 @@
 	.explanation {
 		color: rgba(0, 0, 0, 0.35);
 		margin-left: 6px;
+	}
+
+	.answer-count {
+		margin-bottom: 12px;
 	}
 </style>
